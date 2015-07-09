@@ -1,0 +1,1 @@
+cola.use( function () { } );

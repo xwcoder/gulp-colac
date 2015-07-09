@@ -1,6 +1,11 @@
-# gulp-colac [![Build Status](https://travis-ci.org/creep/gulp-colac.svg?branch=master)](https://travis-ci.org/creep/gulp-colac)
+# gulp-colac
 
-> My dazzling gulp plugin
+> gulp plugin for [cola](https://github.com/xwcoder/cola)
+
+the plugin do 3 things:
+1. parse dependent modules, and add `define wrap` to module files
+2. parse dependent modules for files which using `cola.use`
+3. order output stream: put file to last positoin which contains `cola.use`
 
 
 ## Install
@@ -30,12 +35,12 @@ gulp.task('default', function () {
 
 #### options
 
-##### foo
+##### relativePath 
 
-Type: `boolean`  
-Default: `false`
+Type: `String`  
+Default: `null`
 
-Lorem ipsum.
+ignore `relativePath` when using `file path` to generate module id.
 
 
 ## License
