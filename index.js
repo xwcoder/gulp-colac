@@ -12,9 +12,6 @@ module.exports = function (options) {
 
   var files = []; //调整文件顺序, cola.use排最后
 
-  /**
-   * 删除源码中的注释
-   */
   function removeComment ( code ) {
     return code.replace( /\/\*.*\*\//g, '' )
               .replace( /\/\/.*(?=[\n\t])/g, '')
@@ -34,9 +31,6 @@ module.exports = function (options) {
       return ret;
   }
 
-  /**
-   * 计算依赖
-   */
   function parseDeps ( code ) {
 
       code = removeComment( code );
@@ -54,9 +48,6 @@ module.exports = function (options) {
       return unique( deps );
   }
 
-  /**
-   * 通过文件路径计算得到模块id
-   */
   function getModuleID ( file, options ) {
     var relativePath = path.relative( file.cwd, file.path );
     if ( options && options.relativePath ) {
