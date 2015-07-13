@@ -127,9 +127,15 @@ module.exports = function (options) {
         } else {
           deps = parseDeps(contents);
           id = getModuleID(file, options);
-          contents = 'define("' + id + '", ' + JSON.stringify( deps ) + ', function (require, exports, module) {'
-            + '\n' + contents
-            + '\n} );';
+          if ( options.ns ) {
+            contents = options.ns + '.define("' + id + '", ' + JSON.stringify( deps ) + ', function (require, exports, module) {'
+              + '\n' + contents
+              + '\n} );';
+          } else {
+            contents = 'define("' + id + '", ' + JSON.stringify( deps ) + ', function (require, exports, module) {'
+              + '\n' + contents
+              + '\n} );';
+          }
         }
       }
 
