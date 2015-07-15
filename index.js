@@ -12,10 +12,63 @@ module.exports = function (options) {
 
   var files = []; //调整文件顺序, cola.use排最后
 
-  function removeComment ( code ) {
-    return code.replace( /\/\*.*\*\//g, '' )
-              .replace( /\/\/.*(?=[\n\t])/g, '')
-              .replace( /^\s*\/\*[\s\S]*?\*\/\s*$/mg, '' );
+  //function removeComment ( code ) {
+  //  return code.replace( /\/\*.*\*\//g, '' )
+  //            .replace( /\/\/.*(?=[\n\t])/g, '')
+  //            .replace( /^\s*\/\*[\s\S]*?\*\/\s*$/mg, '' );
+  //}
+
+  function removeComments ( code ) {
+      //return code.replace( /\/\*.*\*\//g, '' )
+                  //.replace(/\/\/.*(?=[\n\t])/g, '')
+      code = code.replace(/^\s*\/\/.*(?=[\n\t])/mg, '') //单行注释
+                  .replace( /^\s*\/\*[\s\S]*?\*\/\s*$/mg, '' ); //多行注释
+
+      var char,
+          s = '',
+          index = 0,
+          startQuote,
+          isDoubleSlashComment = false,
+          isAsteriskComment = false;
+
+      while ( char = code[index++] ) {
+
+          //匹配单引号或者双引号字符串
+          if ( !isDoubleSlashComment && !isAsteriskComment && (char == "'" || char == '"') ) {
+              if ( !startQuote ) {
+                  startQuote = char;
+              } else if ( startQuote == char ) {
+                  startQuote = '';
+              }
+          }
+
+          if ( startQuote ) {
+              s += char;
+              continue;
+          }
+
+          if ( isDoubleSlashComment || isAsteriskComment ) {
+              if ( isDoubleSlashComment ) {
+                  if ( char == '\n' ) {
+                      isDoubleSlashComment = false;
+                  }
+              } else {
+                  if ( char == '/' && code[index-2] == '*' ) {
+                      isAsteriskComment = false;
+                  }
+              }
+          } else {
+              if ( char == '/' && code[index] == '/' ) { //行尾双斜线注释开始
+                  isDoubleSlashComment = true;
+              } else if ( char == '/' && code[index] == '*' ) { //单行星号注释
+                  isAsteriskComment = true;
+              } else {
+                  s += char;
+              }
+          }
+      }
+
+      return s;
   }
 
   function unique ( deps ) {
@@ -33,7 +86,7 @@ module.exports = function (options) {
 
   function parseDeps ( code ) {
 
-      code = removeComment( code );
+      code = removeComments( code );
 
       if ( code.indexOf( 'require' ) == '-1' ) {
           return [];
@@ -69,7 +122,8 @@ module.exports = function (options) {
 		}
 
 		try {
-      var contents = removeComment( file.contents.toString(enc) );
+      var _contents = file.contents.toString(enc);
+      var contents = removeComments( _contents );
 
       var partial = '';
       var useBox = '';
@@ -124,16 +178,17 @@ module.exports = function (options) {
         if ( REG_HAS_DEFINE.test(contents) ) {
           //对于源码里自己写define的情况暂不做处理
           //TODO 以后考虑
+          contents = _contents;
         } else {
           deps = parseDeps(contents);
           id = getModuleID(file, options);
           if ( options.ns ) {
             contents = options.ns + '.define("' + id + '", ' + JSON.stringify( deps ) + ', function (require, exports, module) {'
-              + '\n' + contents
+              + '\n' + _contents
               + '\n} );';
           } else {
             contents = 'define("' + id + '", ' + JSON.stringify( deps ) + ', function (require, exports, module) {'
-              + '\n' + contents
+              + '\n' + _contents
               + '\n} );';
           }
         }
