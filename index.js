@@ -104,7 +104,7 @@ module.exports = function (options) {
   function getModuleID ( file, options ) {
     var relativePath = path.relative( file.cwd, file.path );
     if ( options && options.relativePath ) {
-      relativePath = path.relative( 'js', relativePath );
+      relativePath = path.relative( options.relativePath, relativePath );
     }
     return path.join(path.dirname(relativePath), path.basename(relativePath, path.extname(relativePath)));
   }
