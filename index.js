@@ -7,6 +7,7 @@ var path = require('path');
 module.exports = function (options) {
 
   var REG_HAS_DEFINE = /(?:^|\s+)define\s*\(/m;
+  var REG_HAS_USE = /(?:^|\s+)cola\.use\s*\(/mg;
   var REG_MATCH_USE = /((?:^|\s+)cola\.use\s*\(\s*\bfunction\b)/m;
   var REG_REQUIRE = /\brequire\(\s*['"](\S*)['"]\s*\)/g;
 
@@ -133,7 +134,7 @@ module.exports = function (options) {
       var char = '', index = 0, id, deps;
 
 
-      if ( REG_MATCH_USE.test(contents) ) { //处理cola.use
+      if ( REG_HAS_USE.test(contents) ) { //处理cola.use
 
         file._colause = 1;
 
