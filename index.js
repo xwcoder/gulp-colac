@@ -107,7 +107,9 @@ module.exports = function (options) {
     if ( options && options.relativePath ) {
       relativePath = path.relative( options.relativePath, relativePath );
     }
-    return path.join(path.dirname(relativePath), path.basename(relativePath, path.extname(relativePath)));
+
+    var id = path.join(path.dirname(relativePath), path.basename(relativePath, path.extname(relativePath)));
+    return id.replace(/\\/g,'/');
   }
 
 	return through.obj(function (file, enc, cb) {
